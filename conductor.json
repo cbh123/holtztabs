@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "setup": "poetry install",
+        "run": "PORT=$CONDUCTOR_PORT poetry run freetar"
+    }
+}
