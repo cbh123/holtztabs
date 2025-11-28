@@ -23,4 +23,4 @@ RUN adduser -D holtztabs && \
 USER holtztabs
 EXPOSE 22000
 
-ENTRYPOINT ["/usr/local/bin/holtztabs"]
+ENTRYPOINT ["/usr/local/bin/freetar"]
