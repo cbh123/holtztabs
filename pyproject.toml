@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "freetar"
+name = "holtztabs"
 version = "0.15.0"
-description = ""
-authors = ["kmille <github@androidloves.me>"]
+description = "An open source alternative front-end to ultimate-guitar.com"
+authors = ["Charlie Holtz <charlie@charlieholtz.com>"]
 readme = "README.md"
-repository = "https://github.com/kmille/freetar"
-homepage = "https://github.com/kmille/freetar"
+repository = "https://github.com/cbh123/holtztabs"
+homepage = "https://github.com/cbh123/holtztabs"
 
 
 [tool.poetry.dependencies]
@@ -25,4 +25,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-freetar = 'freetar.backend:main'
+holtztabs = 'freetar.backend:main'
