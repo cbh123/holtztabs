@@ -99,7 +99,7 @@ function colorize_favs() {
     $("#results tr").each(function () {
         var tab_url = $(this).find(".song").find("a").attr("href");
         if (favorites[tab_url] != undefined) {
-            $(this).find(".favorite").css("color", "#ffae00");
+            $(this).find(".favorite").addClass("text-amber-500").removeClass("text-neutral-300");
         }
     });
 }
@@ -197,12 +197,12 @@ $('#checkbox_view_chords').click(function(){
 });
 
 $('#dark_mode').click(function(){
-    if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
-        document.documentElement.setAttribute('data-bs-theme', 'light');
+    if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
         localStorage.setItem("dark_mode", false);
     }
     else {
-        document.documentElement.setAttribute('data-bs-theme', 'dark');
+        document.documentElement.classList.add('dark');
         localStorage.setItem("dark_mode", true);
     }
 });
@@ -214,7 +214,8 @@ document.querySelectorAll('.favorite').forEach(item => {
     tab_url = elm.getAttribute('data-url')
     if (tab_url in favorites) {
         delete favorites[tab_url];
-        $(elm).css("color", "");
+        elm.classList.remove('text-amber-500');
+        elm.classList.add('text-neutral-300');
     } else {
       const fav = {
         artist_name: elm.getAttribute('data-artist'),
@@ -224,7 +225,8 @@ document.querySelectorAll('.favorite').forEach(item => {
         tab_url: elm.getAttribute('data-url')
       }
       favorites[fav["tab_url"]] = fav;
-      $(elm).css("color", "#ffae00");
+      elm.classList.add('text-amber-500');
+      elm.classList.remove('text-neutral-300');
     }
     localStorage.setItem("favorites", JSON.stringify(favorites));
   })

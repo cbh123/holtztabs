@@ -1,165 +1,198 @@
 {% extends "base.html" %}
 
-
 {% block content %}
 
-<div class="table-responsive">
-  <table id="results" class="table">
+<div class="space-y-6">
+  {% if search_results and search_results.results %}
+  <!-- Search Results -->
+  <div class="overflow-x-auto">
+    <table id="results" class="w-full">
       <thead>
-          <tr>
-              <th scope="col" class="order">artist</th>
-              <th scope="col" class="order">song</th>
-              <th scope="col" class="order">rating</th>
-              <th scope="col" class="order">type</th>
-              <th scope="col">favorite</th>
-          </tr>
+        <tr class="border-b border-neutral-200 dark:border-neutral-700 text-left text-xs uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+          <th class="order py-3 pr-4 font-medium cursor-pointer hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">Artist</th>
+          <th class="order py-3 pr-4 font-medium cursor-pointer hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">Song</th>
+          <th class="order py-3 pr-4 font-medium cursor-pointer hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors hidden sm:table-cell">Rating</th>
+          <th class="order py-3 pr-4 font-medium cursor-pointer hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors hidden sm:table-cell">Type</th>
+          <th class="py-3 font-medium w-10"></th>
+        </tr>
       </thead>
-      <tbody>
-          {% if search_results %}
-              {% for result in search_results.results %}
-              <tr>
-                  <td class="artist"><a href="/search?search_term={{ result.artist_name }}">{{ result.artist_name}}</a></td>
-                  <td class="song"><a href="{{ result.tab_url}}">{{ result.song_name}} (ver {{result.version}})</a></td>
-                  <td class="rating" data-value="{{ result.rating }}">{{ result.rating}}/5 ({{result.votes}})</td>
-                  <td class="type">{{ result._type}}</td>
-                  <td>
-                    <span data-artist="{{result.artist_name}}" data-song="{{result.song_name}}" data-type="{{result._type}}" data-rating="{{result.rating}}" data-url="{{ result.tab_url }}" class="favorite">★</span>
-                  </td>
-              </tr>
-              {% endfor %}
-          {% endif %}
+      <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+        {% for result in search_results.results %}
+        <tr class="group hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50 transition-colors">
+          <td class="artist py-3 pr-4">
+            <a href="/search?search_term={{ result.artist_name }}" class="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
+              {{ result.artist_name }}
+            </a>
+          </td>
+          <td class="song py-3 pr-4">
+            <a href="{{ result.tab_url }}" class="font-medium hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
+              {{ result.song_name }}
+              <span class="text-neutral-400 dark:text-neutral-500 text-sm font-normal">(v{{ result.version }})</span>
+            </a>
+          </td>
+          <td class="rating py-3 pr-4 text-sm text-neutral-500 dark:text-neutral-400 hidden sm:table-cell" data-value="{{ result.rating }}">
+            {{ result.rating }}/5
+            <span class="text-neutral-400 dark:text-neutral-500">({{ result.votes }})</span>
+          </td>
+          <td class="type py-3 pr-4 hidden sm:table-cell">
+            <span class="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+              {{ result._type }}
+            </span>
+          </td>
+          <td class="py-3">
+            <span
+              data-artist="{{ result.artist_name }}"
+              data-song="{{ result.song_name }}"
+              data-type="{{ result._type }}"
+              data-rating="{{ result.rating }}"
+              data-url="{{ result.tab_url }}"
+              class="favorite text-neutral-300 dark:text-neutral-600 text-lg"
+            >★</span>
+          </td>
+        </tr>
+        {% endfor %}
       </tbody>
-  </table>
-</div>
+    </table>
+  </div>
 
-<div>
-  {% if search_results %}
-        More results
-        <table>
-            <tr>
-                {% for page in range(search_results.total_pages) %}
-                <td>
-                    <a    
-                        {% if page + 1 != search_results.current_page %}
-                            href="/search?search_term={{ search_term }}&page={{ page + 1 }}"
-                        {% endif %}
-                    >{{ page + 1 }}
-                    </a>
-                </td>
-                {% endfor %}
-            </tr>
-        </table>
+  {% if search_results.total_pages > 1 %}
+  <div class="flex items-center gap-2 pt-4">
+    <span class="text-sm text-neutral-500 dark:text-neutral-400 mr-2">Page</span>
+    {% for page in range(search_results.total_pages) %}
+      {% if page + 1 == search_results.current_page %}
+        <span class="px-3 py-1 text-sm font-medium bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 rounded-md">
+          {{ page + 1 }}
+        </span>
+      {% else %}
+        <a
+          href="/search?search_term={{ search_term }}&page={{ page + 1 }}"
+          class="px-3 py-1 text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors"
+        >
+          {{ page + 1 }}
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% elif search_term %}
+  <div class="text-center py-12">
+    <p class="text-neutral-500 dark:text-neutral-400">No results found for "{{ search_term }}"</p>
+  </div>
+
+  {% else %}
+  <div class="py-8 text-center">
+    <h1 class="text-3xl font-bold mb-2">HoltzTabs</h1>
+    <p class="text-neutral-500 dark:text-neutral-400">Charlie's picks</p>
+  </div>
+
+  <div id="favorites-section" class="hidden">
+    <h2 class="text-sm font-medium uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-3">Your Favorites</h2>
+    <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8"></div>
+  </div>
+
+  <div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <a href="/search?search_term=Big Thief" class="group p-5 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 hover:shadow-md transition-all">
+        <span class="text-lg font-semibold group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">Big Thief</span>
+        <span class="block text-sm text-neutral-400 dark:text-neutral-500 mt-1">View chords</span>
+      </a>
+      <a href="/search?search_term=Bob Dylan" class="group p-5 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 hover:shadow-md transition-all">
+        <span class="text-lg font-semibold group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">Bob Dylan</span>
+        <span class="block text-sm text-neutral-400 dark:text-neutral-500 mt-1">View chords</span>
+      </a>
+      <a href="/search?search_term=The Band" class="group p-5 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 hover:shadow-md transition-all">
+        <span class="text-lg font-semibold group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">The Band</span>
+        <span class="block text-sm text-neutral-400 dark:text-neutral-500 mt-1">View chords</span>
+      </a>
+    </div>
+  </div>
   {% endif %}
 </div>
 
-<details><summary>Advanced</summary>
-  <strong class="d-block">Export favorites</strong>
-  <button type="button" class="btn btn-secondary" onclick="exportFavorites()">Export</button><br/>
-  <strong class="mt-3 d-block">Import favorites</strong>
-<input type="file" class="form-control" onchange="importFavorites(this)" />
-</details>
-
 <script>
-        favorites = JSON.parse(localStorage.getItem("favorites")) || {};
+  const favorites = JSON.parse(localStorage.getItem("favorites")) || {};
+  const favKeys = Object.keys(favorites);
 
-        $.each(favorites, function (index, song) {
-            $('#results').append(
-                '<tr>' +
-                '<td>' + song.artist_name + '</td>' +
-                '<td class="song">' +
-                '<a href="' + song.tab_url + '">' + song.song + '</a>' +
-                '</td>' +
-                '<td>' + song.rating + '</td>' +
-                '<td>' + song.type + '</td>' +
-                '<td><span data-artist="'+song.artist_name+'" data-song="'+song.song+'" data-type="'+song.type+'" data-rating="'+song.rating+'" data-url="'+song.tab_url+'" class="favorite">★</span></td>' +
-                '</tr>');
-        });
+  // Show favorites on home page
+  {% if not search_results and not search_term %}
+  if (favKeys.length > 0) {
+    document.getElementById('favorites-section').classList.remove('hidden');
+    const grid = document.getElementById('favorites-grid');
 
-  function exportFavorites() {
-    const blob = new Blob([localStorage.getItem("favorites")], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "freetar-favorites.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    Object.values(favorites).forEach(song => {
+      const card = document.createElement('a');
+      card.href = song.tab_url;
+      card.className = 'group flex items-center justify-between p-4 bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-amber-300 dark:hover:border-amber-600 transition-colors';
+      card.innerHTML = `
+        <div class="min-w-0">
+          <div class="font-medium truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">${song.song}</div>
+          <div class="text-sm text-neutral-500 dark:text-neutral-400 truncate">${song.artist_name}</div>
+        </div>
+        <span class="text-amber-500 text-lg ml-2 shrink-0">★</span>
+      `;
+      grid.appendChild(card);
+    });
   }
+  {% endif %}
 
-  function importFavorites(input) {
-    const file = input.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const content = e.target.result;
-        localStorage.setItem("favorites", content);
-      };
-      reader.readAsText(file);
-      location.reload();
-    }
-  }
+  // For search results page - add favorites to table
+  {% if search_results %}
+  $.each(favorites, function (index, song) {
+    $('#results tbody').append(
+      '<tr class="group hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50 transition-colors">' +
+      '<td class="py-3 pr-4 text-neutral-600 dark:text-neutral-400">' + song.artist_name + '</td>' +
+      '<td class="song py-3 pr-4">' +
+      '<a href="' + song.tab_url + '" class="font-medium hover:text-amber-600 dark:hover:text-amber-400 transition-colors">' + song.song + '</a>' +
+      '</td>' +
+      '<td class="py-3 pr-4 text-sm text-neutral-500 dark:text-neutral-400 hidden sm:table-cell">' + song.rating + '/5</td>' +
+      '<td class="py-3 pr-4 hidden sm:table-cell"><span class="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">' + song.type + '</span></td>' +
+      '<td class="py-3"><span data-artist="'+song.artist_name+'" data-song="'+song.song+'" data-type="'+song.type+'" data-rating="'+song.rating+'" data-url="'+song.tab_url+'" class="favorite text-amber-500 text-lg">★</span></td>' +
+      '</tr>');
+  });
+  {% endif %}
 </script>
 
 <script>
-    favorites_url = Object.keys(JSON.parse(localStorage.getItem("favorites")) || {});
-    for (const fav of [...document.getElementsByClassName('favorite')]) {
-      if (favorites_url.includes(fav.getAttribute('data-url').split("?")[0])) $(fav).css("color", "#ffae00");
-    } 
-
-    // Add sorting to the table
-    // taken from https://stackoverflow.com/a/70024272
-    function table_sort() {
-        console.log('Running table sort code')
-        const styleSheet = document.createElement('style')
-        styleSheet.innerHTML = `
-        .order-inactive span {
-            visibility:hidden;
-        }
-        .order-inactive:hover span {
-            visibility:visible;
-        }
-        .order-active span {
-            visibility: visible;
-        }
-        `
-        document.head.appendChild(styleSheet)
-
-        document.querySelectorAll('th.order').forEach(th_elem => {
-            let asc = true
-            const span_elem = document.createElement('span')
-            span_elem.style = "font-size:0.8rem; margin-left:0.5rem"
-            span_elem.innerHTML = "▼"
-            th_elem.appendChild(span_elem)
-            th_elem.classList.add('order-inactive')
-
-            const index = Array.from(th_elem.parentNode.children).indexOf(th_elem)
-            th_elem.addEventListener('click', (e) => {
-                document.querySelectorAll('th.order').forEach(elem => {
-                    elem.classList.remove('order-active')
-                    elem.classList.add('order-inactive')
-                })
-                th_elem.classList.remove('order-inactive')
-                th_elem.classList.add('order-active')
-
-                if (!asc) {
-                    th_elem.querySelector('span').innerHTML = '▲'
-                } else {
-                    th_elem.querySelector('span').innerHTML = '▼'
-                }
-                const arr = Array.from(th_elem.closest("table").querySelectorAll('tbody tr'))
-                arr.sort((a, b) => {
-                    const a_val = a.dataset.value || a.children[index].innerText
-                    const b_val = b.dataset.value || b.children[index].innerText
-                    return (asc) ? a_val.localeCompare(b_val) : b_val.localeCompare(a_val)
-                })
-                arr.forEach(elem => {
-                    th_elem.closest("table").querySelector("tbody").appendChild(elem)
-                })
-                asc = !asc
-            })
-        })
+  const favorites_url = Object.keys(JSON.parse(localStorage.getItem("favorites")) || {});
+  for (const fav of [...document.getElementsByClassName('favorite')]) {
+    if (favorites_url.includes(fav.getAttribute('data-url')?.split("?")[0])) {
+      fav.classList.add('text-amber-500');
+      fav.classList.remove('text-neutral-300', 'dark:text-neutral-600');
     }
-    table_sort()
+  }
+
+  function table_sort() {
+    document.querySelectorAll('th.order').forEach(th_elem => {
+      let asc = true;
+      const span_elem = document.createElement('span');
+      span_elem.className = 'ml-1 opacity-0 group-hover:opacity-50 transition-opacity text-xs';
+      span_elem.innerHTML = '↓';
+      th_elem.appendChild(span_elem);
+      th_elem.classList.add('group');
+
+      const index = Array.from(th_elem.parentNode.children).indexOf(th_elem);
+      th_elem.addEventListener('click', (e) => {
+        document.querySelectorAll('th.order span').forEach(s => {
+          s.className = 'ml-1 opacity-0 group-hover:opacity-50 transition-opacity text-xs';
+        });
+        span_elem.className = 'ml-1 opacity-100 text-xs';
+        span_elem.innerHTML = asc ? '↓' : '↑';
+
+        const arr = Array.from(th_elem.closest("table").querySelectorAll('tbody tr'));
+        arr.sort((a, b) => {
+          const a_val = a.children[index]?.dataset?.value || a.children[index]?.innerText || '';
+          const b_val = b.children[index]?.dataset?.value || b.children[index]?.innerText || '';
+          return asc ? a_val.localeCompare(b_val) : b_val.localeCompare(a_val);
+        });
+        arr.forEach(elem => {
+          th_elem.closest("table").querySelector("tbody").appendChild(elem);
+        });
+        asc = !asc;
+      });
+    });
+  }
+  table_sort();
 </script>
 
 {% endblock %}

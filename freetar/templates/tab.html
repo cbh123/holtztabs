@@ -1,125 +1,163 @@
 {% extends "base.html" %}
 
-
 {% block content %}
-  
-  <div class="col-sm col-md-8 col-lg-9 col-12">
-      <h5>
-          <a href="/search?search_term={{ tab.artist_name }}">{{ tab.artist_name }}</a> - {{ tab.song_name }} (ver {{tab.version }})
-          <span title="add/remove song to/from favs" class="favorite m-2 d-print-none" data-artist="{{tab.artist_name}}" data-song="{{tab.song_name}}" data-type="{{tab._type}}" data-rating="{{tab.rating}}" data-url="{{ request.path }}">★</span>
-      </h5>
-  </div>
-      
-  <div class="col-sm col-md-4 col-lg-3">
-     View on <a class="d-print-none" href="{{ tab.tab_url }}?no_redirect">Ultimate Guitar</a>
-  </div>
 
-  <div class="col-sm col-md-9 col-lg-9">
-    Difficulty: {{ tab.difficulty }}<br>
-  </div>
-
-  <div class="col-sm col-md-3 col-lg-3">
-      Capo: 
-      {% if tab.capo %}
-          {{ tab.capo -}} th fret
-      {% else %}
-          no capo
-      {% endif %}
-  </div>
-  
-  <div class="col-sm col-lg-12">
-     {% if tab.tuning %}
-         Tuning: {{ tab.tuning }}<br>
-     {% endif %}
-  </div>
-    
-    
-  <div class="d-flex align-items-center d-print-none flex-wrap">
-      <div class="form-check form-switch autoscroll me-4">
-          <input class="form-check-input" type="checkbox" role="switch" id="checkbox_autoscroll" />
-          <label class="form-check-label" for="checkbox_autoscroll">Autoscroll</label>
-          <span role="button" id="scroll_speed_down" title="decrease scroll speed" class="m-2" >❮❮</span>
-          <span role="button" id="scroll_speed_up" title="increase scroll speed" class="m-2" >❯❯</span>
-      </div>
-      
-      <div class="form-check form-switch me-4">
-          <input class="form-check-input" type="checkbox" role="switch" id="checkbox_view_chords"/>
-          <label class="form-check-label" for="checkbox_view_chords">Show chords</label>
-      </div>
-   
-      <div>
-          <span class="">Transpose </span>
-          <span role="button" id="transpose_down" title="transpose down" class="m-2">↓</span>
-          <span role="button" id="transpose_up" title="transpose up" class="m-2">↑</span>
-          <span role="button" id="transposed_steps" class="m-2"></span>
-      </div>
-  </div>
-
-    <hr class="border border-primary"/>
-    <div id="chordVisuals" style="display: none;">
-        <div class="d-grid" style="grid-gap: 3rem; grid-template-columns: repeat(auto-fill, minmax(min(100px, 100%), 1fr));">
-            {% for chord in tab.chords %}
-                {% set i = 0 %}
-                {% set chord_map = tab.chords[chord][i] %}
-                <div class="text-center">
-                    <div>{{chord}}</div>
-                    <table class="table table-borderless table-sm p-2 bg-light rounded text-black">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                {% for x in tab.fingers_for_strings[chord][i] %}
-                                    <th>{{x if x != 0}}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody class="border-3 border-start-0 border-end-0 border-bottom-0 border-black">
-                            {% for fret in chord_map%}
-                                <tr style="font-size: 0.75rem;">
-                                    <td class="m-0 p-0">{{fret}}</td>
-                                    {% for string in chord_map[fret] %}
-                                        <td class="m-0 p-0 border-bottom border-black" style="background: linear-gradient(#000, #000) no-repeat center/1px 100%;">
-                                            <div class="text-align-center text-center m-0 p-0 {{'bg-black rounded-circle' if string==1}}" style="height: 1rem; width: 1rem;"></div>
-                                        </td>
-                                    {%endfor%}
-                                </tr>
-                            {%endfor%}
-                        </tbody>
-                    </table>
-                </div>
-            {% endfor %}
-        </div>
-        <hr class="border border-primary"/>
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-semibold">
+        <a href="/search?search_term={{ tab.artist_name }}" class="text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
+          {{ tab.artist_name }}
+        </a>
+        <span class="text-neutral-300 dark:text-neutral-600 mx-2">–</span>
+        {{ tab.song_name }}
+        <span class="text-neutral-400 dark:text-neutral-500 text-base font-normal">(v{{ tab.version }})</span>
+        <span
+          title="Add/remove from favorites"
+          class="favorite ml-2 text-neutral-300 dark:text-neutral-600 no-print"
+          data-artist="{{ tab.artist_name }}"
+          data-song="{{ tab.song_name }}"
+          data-type="{{ tab._type }}"
+          data-rating="{{ tab.rating }}"
+          data-url="{{ request.path }}"
+        >★</span>
+      </h1>
     </div>
+    <a
+      href="{{ tab.tab_url }}?no_redirect"
+      class="text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors no-print shrink-0"
+    >
+      View on Ultimate Guitar →
+    </a>
+  </div>
 
-    <div class="tab font-monospace">
-        {{ tab.tab | safe }} 
-    </div>
-
-    {% if tab.alternatives %}
-    <div class="d-print-none mt-4">
-        <h2>Alternative versions</h2>
-        <ul class="list-unstyled">
-        {% for alt in tab.alternatives %}
-            <li><a href="{{ alt.tab_url }}">
-              Version {{ alt.version }} ({{ alt._type }}) {{alt.rating }}/5 ({{ alt.votes }})
-            </a></li>
-        {% endfor %}
-        </ul>
-    </div>
+  <!-- Metadata -->
+  <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400">
+    <span>
+      <span class="text-neutral-400 dark:text-neutral-500">Difficulty:</span>
+      {{ tab.difficulty or 'Unknown' }}
+    </span>
+    <span>
+      <span class="text-neutral-400 dark:text-neutral-500">Capo:</span>
+      {% if tab.capo %}{{ tab.capo }}th fret{% else %}None{% endif %}
+    </span>
+    {% if tab.tuning %}
+    <span>
+      <span class="text-neutral-400 dark:text-neutral-500">Tuning:</span>
+      {{ tab.tuning }}
+    </span>
     {% endif %}
+  </div>
 
+  <!-- Controls -->
+  <div class="flex flex-wrap items-center gap-4 py-3 px-4 bg-neutral-100 dark:bg-neutral-800 rounded-lg no-print">
+    <label class="flex items-center gap-2 cursor-pointer select-none">
+      <input type="checkbox" id="checkbox_autoscroll" class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-neutral-100 focus:ring-neutral-500 dark:bg-neutral-700" />
+      <span class="text-sm">Autoscroll</span>
+      <span id="scroll_speed_down" role="button" title="Slower" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer transition-colors">◀◀</span>
+      <span id="scroll_speed_up" role="button" title="Faster" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer transition-colors">▶▶</span>
+    </label>
+
+    <div class="w-px h-5 bg-neutral-300 dark:bg-neutral-600 hidden sm:block"></div>
+
+    <label class="flex items-center gap-2 cursor-pointer select-none">
+      <input type="checkbox" id="checkbox_view_chords" class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-neutral-100 focus:ring-neutral-500 dark:bg-neutral-700" />
+      <span class="text-sm">Show chords</span>
+    </label>
+
+    <div class="w-px h-5 bg-neutral-300 dark:bg-neutral-600 hidden sm:block"></div>
+
+    <div class="flex items-center gap-2 text-sm">
+      <span class="text-neutral-500 dark:text-neutral-400">Transpose</span>
+      <button id="transpose_down" title="Down" class="w-7 h-7 flex items-center justify-center rounded bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors">−</button>
+      <button id="transpose_up" title="Up" class="w-7 h-7 flex items-center justify-center rounded bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors">+</button>
+      <span id="transposed_steps" class="text-sm font-medium text-amber-600 dark:text-amber-400 min-w-[2rem]"></span>
+    </div>
+  </div>
+
+  <!-- Chord diagrams -->
+  <div id="chordVisuals" class="hidden">
+    <div class="grid gap-6" style="grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));">
+      {% for chord in tab.chords %}
+        {% set i = 0 %}
+        {% set chord_map = tab.chords[chord][i] %}
+        <div class="text-center">
+          <div class="text-sm font-medium mb-1">{{ chord }}</div>
+          <div class="bg-white dark:bg-neutral-800 rounded-lg p-2 border border-neutral-200 dark:border-neutral-700">
+            <div class="flex justify-center gap-0.5 text-[10px] text-neutral-500 mb-1">
+              {% for x in tab.fingers_for_strings[chord][i] %}
+                <span class="w-3 text-center">{{ x if x != 0 else '' }}</span>
+              {% endfor %}
+            </div>
+            <div class="border-t-2 border-neutral-900 dark:border-neutral-100">
+              {% for fret in chord_map %}
+                <div class="flex items-center">
+                  <span class="text-[9px] text-neutral-400 w-3 text-right pr-1">{{ fret }}</span>
+                  <div class="flex">
+                    {% for string in chord_map[fret] %}
+                      <div class="w-3 h-3 border-b border-l border-neutral-300 dark:border-neutral-600 flex items-center justify-center" style="background: linear-gradient(to right, transparent 45%, #a3a3a3 45%, #a3a3a3 55%, transparent 55%);">
+                        {% if string == 1 %}
+                          <div class="w-2 h-2 rounded-full bg-neutral-900 dark:bg-neutral-100"></div>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <hr class="my-6 border-neutral-200 dark:border-neutral-700" />
+  </div>
+
+  <!-- Tab content -->
+  <div class="tab-container p-6 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm">
+    <div class="tab font-mono whitespace-pre-wrap overflow-x-auto">{{ tab.tab | safe }}</div>
+  </div>
+
+  <!-- Alternative versions -->
+  {% if tab.alternatives %}
+  <div class="no-print pt-6 border-t border-neutral-200 dark:border-neutral-700">
+    <h2 class="text-lg font-semibold mb-3">Alternative versions</h2>
+    <div class="space-y-2">
+      {% for alt in tab.alternatives %}
+        <a
+          href="{{ alt.tab_url }}"
+          class="block p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+        >
+          <span class="font-medium">Version {{ alt.version }}</span>
+          <span class="inline-flex ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400">
+            {{ alt._type }}
+          </span>
+          <span class="text-neutral-500 dark:text-neutral-400 text-sm ml-2">
+            {{ alt.rating }}/5 ({{ alt.votes }} votes)
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
 
 <script>
-    $(document).ready(function () {
+  $(document).ready(function () {
+    favorites = JSON.parse(localStorage.getItem("favorites")) || {};
+    if (window.location.pathname in favorites) {
+      $(".favorite").addClass("text-amber-500").removeClass("text-neutral-300 dark:text-neutral-600");
+    }
 
-        favorites = JSON.parse(localStorage.getItem("favorites")) || {};
-        if (window.location.pathname in favorites) {
-            console.log("True!");
-            $(".favorite").css("color", "#ffae00");
-        }
-
-    });
-
+    // Style section headers like [Verse 1], [Chorus], etc.
+    const tabContent = document.querySelector('.tab');
+    if (tabContent) {
+      tabContent.innerHTML = tabContent.innerHTML.replace(
+        /\[(Verse[^\]]*|Chorus[^\]]*|Bridge[^\]]*|Intro[^\]]*|Outro[^\]]*|Pre-Chorus[^\]]*|Interlude[^\]]*|Solo[^\]]*|Hook[^\]]*|Breakdown[^\]]*|Refrain[^\]]*)\]/gi,
+        '<span class="section-label">$1</span>'
+      );
+    }
+  });
 </script>
 
 {% endblock %}

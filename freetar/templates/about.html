@@ -1,12 +1,34 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div>
-    <strong>HoltzTabs</strong> is <a href="https://charlieholtz.com">Charlie Holtz</a>'s fork of <a href="https://github.com/kmille/freetar">freetar</a>, an open source alternative front-end to ultimate-guitar.com<br>
-    Running version v{{ version }}<br>
-    License: <a href="https://github.com/cbh123/holtztabs/blob/main/LICENSE">GPL 3.0</a><br>
-    Source Code: <a href="https://github.com/cbh123/holtztabs">https://github.com/cbh123/holtztabs</a><br>
-    Any problems? Wishes? Create an <a href="https://github.com/cbh123/holtztabs/issues/new">issue</a>.<br>
+<div class="max-w-xl">
+  <h1 class="text-2xl font-semibold mb-6">About</h1>
+
+  <div class="space-y-4 text-neutral-600 dark:text-neutral-400">
+    <p>
+      <strong class="text-neutral-900 dark:text-neutral-100">HoltzTabs</strong> is
+      <a href="https://charlieholtz.com" class="text-neutral-900 dark:text-neutral-100 underline hover:no-underline">Charlie Holtz</a>'s
+      fork of <a href="https://github.com/kmille/freetar" class="text-neutral-900 dark:text-neutral-100 underline hover:no-underline">freetar</a>,
+      an open source alternative front-end to ultimate-guitar.com.
+    </p>
+
+    <p>Running version <span class="font-mono text-sm bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">v{{ version }}</span></p>
+
+    <div class="pt-4 space-y-2">
+      <p>
+        <span class="text-neutral-400 dark:text-neutral-500">License:</span>
+        <a href="https://github.com/cbh123/holtztabs/blob/main/LICENSE" class="text-neutral-900 dark:text-neutral-100 underline hover:no-underline">GPL 3.0</a>
+      </p>
+      <p>
+        <span class="text-neutral-400 dark:text-neutral-500">Source:</span>
+        <a href="https://github.com/cbh123/holtztabs" class="text-neutral-900 dark:text-neutral-100 underline hover:no-underline">github.com/cbh123/holtztabs</a>
+      </p>
+      <p>
+        <span class="text-neutral-400 dark:text-neutral-500">Issues?</span>
+        <a href="https://github.com/cbh123/holtztabs/issues/new" class="text-neutral-900 dark:text-neutral-100 underline hover:no-underline">Open an issue</a>
+      </p>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

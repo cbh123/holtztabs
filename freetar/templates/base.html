@@ -1,12 +1,9 @@
 <!doctype html>
-<html data-bs-theme="light" lang="en">
+<html lang="en">
 
 {% import 'macros.j2' as macros %}
 
-
-
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -16,78 +13,135 @@
 
   <meta property="og:title" content="HoltzTabs - guitar chords from Ultimate Guitar">
   <meta property="og:site_name" content="HoltzTabs">
-  <meta property="og:url" content=https://freetar.de>
+  <meta property="og:url" content="https://freetar.de">
   <meta property="og:description" content="HoltzTabs is an alternative frontend for ultimate-guitar.com">
-  <meta property="og:type" content=website>
-  <meta property="og:image" content=https://freetar.de/static/holtztabs.svg>
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://freetar.de/static/holtztabs.svg">
 
-
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['ui-monospace', 'SFMono-Regular', 'SF Mono', 'Menlo', 'Consolas', 'Liberation Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
   <title>{{ title or "HoltzTabs - guitar chords from Ultimate Guitar" }}</title>
   <link rel="icon" type="image/svg+xml" href="/static/holtztabs.svg" />
+
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+    }
+    .favorite { cursor: pointer; transition: color 0.15s ease; }
+    .favorite:hover { color: #f59e0b !important; }
+    .favorite.active { color: #f59e0b; }
+
+    /* Tab content styling */
+    .tab {
+      font-size: 1.125rem;
+      line-height: 1.9;
+      color: #262626;
+    }
+    .dark .tab {
+      color: #e5e5e5;
+    }
+    .tab .chord {
+      color: #737373;
+      font-weight: 500;
+      cursor: default;
+      font-size: 0.9em;
+    }
+    .dark .tab .chord {
+      color: #a3a3a3;
+    }
+    .tab .section-label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #f59e0b;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+    }
+    .tab .section-label:first-child {
+      margin-top: 0;
+    }
+    .dark .tab .section-label {
+      color: #fbbf24;
+    }
+  </style>
+
   <script>
     let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (JSON.parse(localStorage.getItem("dark_mode")) || isDarkMode)
-      document.documentElement.setAttribute('data-bs-theme', 'dark')
+    if (JSON.parse(localStorage.getItem("dark_mode")) || isDarkMode) {
+      document.documentElement.classList.add('dark');
+    }
   </script>
 </head>
 
-<body>
+<body class="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 min-h-screen transition-colors">
 
-  <nav class="mb-2 navbar navbar-expand-lg bg-body-tertiary d-print-none">
-    <div class="container d-flex" style="flex-wrap: nowrap;">
-      <a class="navbar-brand" href="/">HoltzTabs</a>
-      <form class="d-flex w-50" method="GET" action="/search">
-          {% if search_term %}
-            <input required class="form-control me-2" name="search_term" type="search" value="{{ search_term }}" aria-label="Search">
-          {% else %}
-            <input required class="form-control me-2" name="search_term" type="search" placeholder="Search for chords" aria-label="Search">
-          {% endif %}
-        <button class="btn btn-outline-success d-none d-md-block" type="submit">🔎</button>
-      </form>
-      <ul class="navbar-nav ms-2" style="flex-direction: row;">
-        <li class="nav-item">
-          <a class="nav-link" href="/about">
-            <span class="d-none d-md-inline">About</span>
+  <nav class="sticky top-0 z-50 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-700 no-print">
+    <div class="max-w-5xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between gap-4">
+        <a href="/" class="text-lg font-semibold tracking-tight hover:opacity-70 transition-opacity">
+          HoltzTabs
+        </a>
+
+        <form class="flex-1 max-w-md" method="GET" action="/search">
+          <div class="relative">
+            <input
+              required
+              type="search"
+              name="search_term"
+              {% if search_term %}value="{{ search_term }}"{% endif %}
+              placeholder="Search for chords..."
+              aria-label="Search"
+              class="w-full px-4 py-2 pl-10 bg-neutral-100 dark:bg-neutral-700 border-0 rounded-lg text-sm placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100 transition-shadow"
+            />
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+        </form>
+
+        <div class="flex items-center gap-4">
+          <a href="/about" class="text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors hidden sm:block">
+            About
           </a>
-        </li>
-        <li class="nav-item ms-4">
-          <a class="nav-link">
-            <span role="button" title="enable/disable dark mode" id="dark_mode">
-              🌓︎
-            </span></a>
-        </li>
-      </ul>
+          <button
+            id="dark_mode"
+            title="Toggle dark mode"
+            class="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+          >
+            <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   </nav>
 
-
-  <div class="container">
-      <div class="row">
-          {% block content %}
-          {% endblock %}
-      </div>
-  </div>
+  <main class="max-w-5xl mx-auto px-4 py-6">
+    {% block content %}
+    {% endblock %}
+  </main>
 
   <script src="/static/custom.js"></script>
-
-  <!-- Optional JavaScript; choose one of the two! -->
-
-  <!-- Option 1: Bootstrap Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
-
-  <!-- Option 2: Separate Popper and Bootstrap JS -->
-  <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
-
-    -->
 </body>
 
 </html>
