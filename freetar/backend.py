@@ -1,3 +1,4 @@
+import hashlib
 import waitress
 import os
 from flask import Flask, render_template, request
@@ -6,6 +7,17 @@ from flask_minify import Minify
 
 from freetar.ug import Search, ug_tab
 from freetar.utils import get_version, FreetarError
+
+
+def get_port():
+    """Get port from environment variable or hash the workspace folder name."""
+    if "PORT" in os.environ:
+        return int(os.environ["PORT"])
+    # Hash the current directory name to get a deterministic port
+    folder_name = os.path.basename(os.getcwd())
+    hash_int = int(hashlib.md5(folder_name.encode()).hexdigest(), 16)
+    # Map to port range 22001-32000 (10000 ports)
+    return 22001 + (hash_int % 10000)
 
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache',
                       "CACHE_DEFAULT_TIMEOUT": 0,
@@ -81,7 +93,7 @@ def internal_error(error):
 
 def main():
     host = "0.0.0.0"
-    port = 22000
+    port = get_port()
     if __name__ == '__main__':
         app.run(debug=True,
                 host=host,
