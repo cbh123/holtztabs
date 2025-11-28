@@ -97,10 +97,10 @@ def internal_error(error):
 def main():
     host = "0.0.0.0"
     port = get_port()
-    if __name__ == '__main__':
-        app.run(debug=True,
-                host=host,
-                port=port)
+    debug = os.environ.get("DEBUG", "").lower() in ("1", "true", "yes")
+    if debug:
+        print(f"Running backend on http://localhost:{port} with hot reload enabled")
+        app.run(debug=True, host=host, port=port)
     else:
         threads = os.environ.get("THREADS", "4")
         print(f"Running backend on http://localhost:{port} with {threads} threads")
