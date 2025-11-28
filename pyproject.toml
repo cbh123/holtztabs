@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "holtztabs"
+name = "freetar"
 version = "0.15.0"
 description = "An open source alternative front-end to ultimate-guitar.com"
 authors = ["Charlie Holtz <charlie@charlieholtz.com>"]
@@ -25,4 +25,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-holtztabs = 'freetar.backend:main'
+freetar = 'freetar.backend:main'
