@@ -35,9 +35,12 @@ def export_variables():
     }
 
 
+FEATURED_ARTISTS = ["Big Thief", "Bob Dylan", "The Band"]
+
+
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", featured_artists=FEATURED_ARTISTS)
 
 
 @app.route("/search")
